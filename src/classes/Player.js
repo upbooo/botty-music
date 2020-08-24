@@ -2,7 +2,6 @@ const fs = require('fs-extra');
 const ytdl = require('ytdl-core');
 const scdl = require('soundcloud-downloader')
 const logger = require('@greencoast/logger');
-const { channel_id, shuffle, soundcloud_client_id } = require('../../config/settings');
 const { PRESENCE_STATUS, ACTIVITY_TYPE } = require('../constants');
 const { shuffleArray } = require('../utils');
 const streamEvents = require('../events/stream');

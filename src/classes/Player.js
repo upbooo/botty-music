@@ -167,11 +167,11 @@ class Player {
       return null;
     }
 
-    if (this.listeners >= 0) {
+    if (this.listeners >= 1) {
       return this.resumeDispatcher();
     }
 
-    //return this.pauseDispatcher();
+    return this.pauseDispatcher();
   }
 
   resumeDispatcher() {

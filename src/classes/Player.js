@@ -22,6 +22,24 @@ class Player {
 
   initialize() {
     this.updatePresence();
+
+    this.client.channels.fetch(channel_id)
+      .then((channel) => {
+        if (!channel.joinable) {
+          logger.fatal("I cannot join the configured voice channel. Maybe I don't have enough permissions?");
+          process.exit(1);
+        }
+
+        this.updateChannel(channel);
+      })
+      .catch((error) => {
+        if (error === 'DiscordAPIError: Unknown Channel') {
+          logger.fatal('The channel I tried to join no does not exist. Please check the channel ID set up in your settings file.');
+        } else {
+          logger.fatal('Something went wrong when trying to look for the channel I was supposed to join.', error);
+        }
+        process.exit(1);
+      });
   }
 
   updateChannel(channel) {

@@ -91,9 +91,6 @@ class Player {
   }
 
   async play() {
-    if (this.songEntry >= queue.length) {
-      this.songEntry = 0;
-    }
 
     try {
       const stream = await this.createStream()
@@ -101,14 +98,12 @@ class Player {
 
       this.dispatcher.on(dispatcherEvents.speaking, (speaking) => {
         if (!speaking && !this.paused) {
-          this.songEntry++;
           this.play();
         }
       });
 
       this.dispatcher.on(dispatcherEvents.error, (error) => {
         logger.error(error);
-        this.songEntry++;
         this.play();
       });
 
@@ -119,7 +114,6 @@ class Player {
       }
     } catch (error) {
       logger.error(error);
-      this.songEntry++;
       this.play();
     }
   }

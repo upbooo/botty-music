@@ -15,7 +15,7 @@ class Player {
     this.connection = null;
     this.dispatcher = null;
     this.listeners = 0;
-    this.songEntry = 1;
+    this.songEntry = 0;
     this.paused = null;
     this.song = null;
   }

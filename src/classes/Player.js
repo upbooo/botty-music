@@ -53,9 +53,8 @@ class Player {
   updateChannel(channel) {
     logger.info(`Joined ${channel.name} in ${channel.guild.name}.`);
     this.channel = channel;
-    this.updateListeners();
 
-    if (!this.connection && this.listeners >= 1) {
+    if (!this.connection) {
       channel.join()
         .then((connection) => {
           this.connection = connection;

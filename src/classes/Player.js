@@ -30,7 +30,6 @@ class Player {
 
   initialize() {
     this.updatePresence();
-    this.updateListeners();
 
     this.client.channels.fetch(channel_id)
       .then((channel) => {
@@ -69,7 +68,7 @@ class Player {
           logger.error(error);
         });
     }
-    else if (this.listeners == 0) {
+    else if (this.listeners <= 0) {
        channel.leave();
     }
   }

@@ -69,7 +69,7 @@ class Player {
           logger.error(error);
         });
     }
-    else if (this.listeners > 0) {
+    else if (this.listeners == 0) {
        channel.leave();
     }
   }

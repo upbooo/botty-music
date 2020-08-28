@@ -30,6 +30,7 @@ class Player {
 
   initialize() {
     this.updatePresence();
+    this.updateListeners();
 
     this.client.channels.fetch(channel_id)
       .then((channel) => {
@@ -54,7 +55,7 @@ class Player {
     logger.info(`Joined ${channel.name} in ${channel.guild.name}.`);
     this.channel = channel;
 
-    if (!this.connection) {
+    if (!this.connection && this.listeners > 0) {
       channel.join()
         .then((connection) => {
           this.connection = connection;
@@ -67,6 +68,9 @@ class Player {
         .catch((error) => {
           logger.error(error);
         });
+    }
+    else if (this.listeners > 0) {
+       channel.leave();
     }
   }
 

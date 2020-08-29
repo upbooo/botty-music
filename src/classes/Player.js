@@ -174,7 +174,8 @@ class Player {
     }
 
     this.paused = false;
-    this.dispatcher.resume();
+   // this.dispatcher.resume();
+    this.play();
     this.updateSongPresence();
     logger.info(`Music has been resumed. Playing ${this.song} for ${this.listeners} user(s) in ${this.channel.name}.`);
     return true;

@@ -91,6 +91,9 @@ class Player {
   }
 
   async play() {
+    if (this.songEntry >= queue.length) {
+      this.songEntry = 0;
+    }
 
     try {
       const stream = await this.createStream()
@@ -98,12 +101,14 @@ class Player {
 
       this.dispatcher.on(dispatcherEvents.speaking, (speaking) => {
         if (!speaking && !this.paused) {
+          this.songEntry++;
           this.play();
         }
       });
 
       this.dispatcher.on(dispatcherEvents.error, (error) => {
         logger.error(error);
+        this.songEntry++;
         this.play();
       });
 
@@ -114,6 +119,7 @@ class Player {
       }
     } catch (error) {
       logger.error(error);
+      this.songEntry++;
       this.play();
     }
   }
@@ -161,7 +167,7 @@ class Player {
       return null;
     }
 
-    if (this.listeners >= 1) {
+    if (this.listeners > 0) {
       return this.resumeDispatcher();
     }
 
@@ -174,7 +180,7 @@ class Player {
     }
 
     this.paused = false;
-   // this.dispatcher.resume();
+    //this.dispatcher.resume();
     this.play();
     this.updateSongPresence();
     logger.info(`Music has been resumed. Playing ${this.song} for ${this.listeners} user(s) in ${this.channel.name}.`);

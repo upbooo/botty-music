@@ -1,19 +1,11 @@
 const fs = require('fs-extra');
 const ytdl = require('ytdl-core');
-const scdl = require('soundcloud-downloader')
 const logger = require('@greencoast/logger');
-const { shuffle, soundcloud_client_id } = require('../events/settings');
 const { PRESENCE_STATUS, ACTIVITY_TYPE } = require('../constants');
-const { shuffleArray } = require('../utils');
 const streamEvents = require('../events/stream');
 const dispatcherEvents = require('../events/dispatcher');
-
 const queueFilename = './data/queue.txt';
 const queue = fs.readFileSync(queueFilename).toString().split('\n').filter((url) => url.startsWith('https://'));
-
-if (shuffle) {
-  shuffleArray(queue);
-}
 
 class Player {
   constructor(client) {
@@ -25,7 +17,6 @@ class Player {
     this.songEntry = 0;
     this.paused = null;
     this.song = null;
-    this.soundcloudClientID = soundcloud_client_id
   }
 
   initialize() {
@@ -125,13 +116,7 @@ class Player {
   }
 
   async createStream() {
-    const url = queue[this.songEntry];
-    if (url.includes('youtube.com')) {
-      return this.createYoutubeStream()
-
-    } else if (url.includes('soundcloud.com') && !!this.soundcloudClientID) {
-      return await this.createSoundcloudStream();
-    }
+    return this.createYoutubeStream();
   }
 
   createYoutubeStream() {
@@ -146,18 +131,6 @@ class Player {
         this.updateSongPresence();
       }
     });
-
-    return stream
-  }
-
-  async createSoundcloudStream() {
-    const stream = await scdl.download(queue[this.songEntry], this.soundcloudClientID);
-    const info = await scdl.getInfo(queue[this.songEntry], this.soundcloudClientID);
-
-    this.song = info.title;
-    if (!this.updateDispatcherStatus()) {
-      this.updateSongPresence();
-    }
 
     return stream
   }
@@ -180,7 +153,6 @@ class Player {
     }
 
     this.paused = false;
-    //this.dispatcher.resume();
     this.play();
     this.updateSongPresence();
     logger.info(`Music has been resumed. Playing ${this.song} for ${this.listeners} user(s) in ${this.channel.name}.`);

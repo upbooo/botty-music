@@ -1,6 +1,6 @@
 {
-  "name": "discord-music-24-7",
-  "version": "2.0.0",
+  "name": "botty-music",
+  "version": "1.0.0",
   "description": "A 24/7 music bot for Discord.",
   "main": "src/app.js",
   "scripts": {
@@ -14,14 +14,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/moonstar-x/discord-music-24-7.git"
+    "url": "git+https://github.com/upbooo/botty-music.git"
   },
-  "author": "moonstar-x",
-  "license": "MIT",
+  "author": "upbooo",
   "bugs": {
-    "url": "https://github.com/moonstar-x/discord-music-24-7/issues"
+    "url": "https://github.com/upbooo/botty-music/issues"
   },
-  "homepage": "https://github.com/moonstar-x/discord-music-24-7#readme",
+  "homepage": "https://github.com/upbooo/botty-music#readme",
   "dependencies": {
     "@discordjs/opus": "^0.3.2",
     "@greencoast/logger": "^1.0.1",

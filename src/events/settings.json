@@ -1,6 +1,6 @@
 {
-  "discord_token": "NzQ3NDgzODQxMzU4NDYyOTk3.X0Pikw.MjW9shpb5lhJDFXyMeuNQDGKSxg",
+  "discord_token": "process.env.DISCORD_TOKEN", 
   "soundcloud_client_id": "",
-  "channel_id": "746823728813572177",
+  "channel_id": "process.env.CHANNEL_ID",
   "shuffle": false
 }

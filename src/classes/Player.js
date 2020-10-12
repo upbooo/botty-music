@@ -4,8 +4,6 @@ const logger = require('@greencoast/logger');
 const { PRESENCE_STATUS, ACTIVITY_TYPE } = require('../constants');
 const streamEvents = require('../events/stream');
 const dispatcherEvents = require('../events/dispatcher');
-const queueFilename = './data/queue.txt';
-const queue = fs.readFileSync(queueFilename).toString().split('\n').filter((url) => url.startsWith('https://'));
 
 class Player {
   constructor(client) {
@@ -82,9 +80,7 @@ class Player {
   }
 
   async play() {
-    if (this.songEntry >= queue.length) {
-      this.songEntry = 0;
-    }
+    this.songEntry = 0;
 
     try {
       const stream = await this.createStream()

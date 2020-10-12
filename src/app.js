@@ -1,5 +1,5 @@
 const { Client } = require('discord.js');
-const { discord_token } = require('./events/settings');
+// const { discord_token } = require('./events/settings');
 const appEvents = require('./events/app');
 const appHandlers = require('./events/handlers/app');
 const Player = require('./classes/Player');
@@ -20,4 +20,4 @@ if (process.argv[2] === '--debug') {
   client.on(appEvents.debug, appHandlers.handleDebug);
 }
 
-client.login(discord_token);
+client.login(process.env.DISCORD_TOKEN);

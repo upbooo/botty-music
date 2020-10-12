@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const ytdl = require('ytdl-core');
 const scdl = require('soundcloud-downloader')
 const logger = require('@greencoast/logger');
-const { channel_id, shuffle, soundcloud_client_id } = require('../events/settings');
+const { shuffle, soundcloud_client_id } = require('../events/settings');
 const { PRESENCE_STATUS, ACTIVITY_TYPE } = require('../constants');
 const { shuffleArray } = require('../utils');
 const streamEvents = require('../events/stream');
@@ -31,7 +31,7 @@ class Player {
   initialize() {
     this.updatePresence();
 
-    this.client.channels.fetch(channel_id)
+    this.client.channels.fetch(process.env.CHANNEL_ID)
       .then((channel) => {
         if (!channel.joinable) {
           logger.fatal("I cannot join the configured voice channel. Maybe I don't have enough permissions?");

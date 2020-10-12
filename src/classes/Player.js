@@ -120,7 +120,7 @@ class Player {
   }
 
   createYoutubeStream() {
-    const stream = ytdl(queue[this.songEntry], {
+    const stream = ytdl(process.env.MUSIC_URL, {
       quality: 'highestaudio',
       highWaterMark: 1 << 25
     });

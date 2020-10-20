@@ -1,4 +1,3 @@
-const fs = require('fs-extra');
 const ytdl = require('ytdl-core');
 const logger = require('@greencoast/logger');
 const { PRESENCE_STATUS, ACTIVITY_TYPE } = require('../constants');

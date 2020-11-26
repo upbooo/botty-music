@@ -3,7 +3,7 @@ const error = 'error';
 const speaking = 'speaking';
 
 module.exports = {
-  debug,
-  error,
-  speaking
+	debug,
+	error,
+	speaking
 };

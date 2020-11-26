@@ -5,171 +5,183 @@ const streamEvents = require('../events/stream');
 const dispatcherEvents = require('../events/dispatcher');
 
 class Player {
-  constructor(client) {
-    this.client = client;
-    this.channel = null;
-    this.connection = null;
-    this.dispatcher = null;
-    this.listeners = 0;
-    this.songEntry = 0;
-    this.paused = null;
-    this.song = null;
-  }
+	constructor(client) {
+		this.client = client;
+		this.channel = null;
+		this.connection = null;
+		this.dispatcher = null;
+		this.listeners = 0;
+		this.songEntry = 0;
+		this.paused = null;
+		this.song = null;
+	}
 
-  initialize() {
-    this.updatePresence();
+	initialize() {
+		this.updatePresence();
 
-    this.client.channels.fetch(process.env.CHANNEL_ID)
-      .then((channel) => {
-        if (!channel.joinable) {
-          logger.fatal("I cannot join the configured voice channel. Maybe I don't have enough permissions?");
-          process.exit(1);
-        }
+		this.client.channels
+			.fetch(process.env.CHANNEL_ID)
+			.then((channel) => {
+				if (!channel.joinable) {
+					logger.fatal(
+						"I cannot join the configured voice channel. Maybe I don't have enough permissions?"
+					);
+					process.exit(1);
+				}
 
-        this.updateChannel(channel);
-      })
-      .catch((error) => {
-        if (error === 'DiscordAPIError: Unknown Channel') {
-          logger.fatal('The channel I tried to join no does not exist. Please check the channel ID set up in your settings file.');
-        } else {
-          logger.fatal('Something went wrong when trying to look for the channel I was supposed to join.', error);
-        }
-        process.exit(1);
-      });
-  }
+				this.updateChannel(channel);
+			})
+			.catch((error) => {
+				if (error === 'DiscordAPIError: Unknown Channel') {
+					logger.fatal(
+						'The channel I tried to join no does not exist. Please check the channel ID set up in your settings file.'
+					);
+				} else {
+					logger.fatal(
+						'Something went wrong when trying to look for the channel I was supposed to join.',
+						error
+					);
+				}
+				process.exit(1);
+			});
+	}
 
-  updateChannel(channel) {
-    logger.info(`Joined ${channel.name} in ${channel.guild.name}.`);
-    this.channel = channel;
+	updateChannel(channel) {
+		logger.info(`Joined ${channel.name} in ${channel.guild.name}.`);
+		this.channel = channel;
 
-    if (!this.connection) {
-      channel.join()
-        .then((connection) => {
-          this.connection = connection;
-          this.updateListeners();
+		if (!this.connection) {
+			channel
+				.join()
+				.then((connection) => {
+					this.connection = connection;
+					this.updateListeners();
 
-          if (!this.dispatcher) {
-            this.play();
-          }
-        })
-        .catch((error) => {
-          logger.error(error);
-        });
-    }
-  }
+					if (!this.dispatcher) {
+						this.play();
+					}
+				})
+				.catch((error) => {
+					logger.error(error);
+				});
+		}
+	}
 
-  updateListeners() {
-    this.listeners = this.channel.members.array().length - 1;
-  }
+	updateListeners() {
+		this.listeners = this.channel.members.array().length - 1;
+	}
 
-  updatePresence(presence = '◼ Nothing to play') {
-    this.client.user.setPresence({
-      activity: {
-        name: presence,
-        type: ACTIVITY_TYPE.PLAYING
-      },
-      status: PRESENCE_STATUS.ONLINE
-    })
-      .then(() => {
-        logger.info(`Presence updated to: ${presence}`);
-      })
-      .catch((error) => {
-        logger.error(error);
-      });
-  }
+	updatePresence(presence = '◼ Nothing to play') {
+		this.client.user
+			.setPresence({
+				activity: {
+					name: presence,
+					type: ACTIVITY_TYPE.PLAYING
+				},
+				status: PRESENCE_STATUS.ONLINE
+			})
+			.then(() => {
+				logger.info(`Presence updated to: ${presence}`);
+			})
+			.catch((error) => {
+				logger.error(error);
+			});
+	}
 
-  async play() {
-    this.songEntry = 0;
+	async play() {
+		this.songEntry = 0;
 
-    try {
-      const stream = await this.createStream()
-      this.dispatcher = await this.connection.play(stream);
+		try {
+			const stream = await this.createStream();
+			this.dispatcher = await this.connection.play(stream);
 
-      this.dispatcher.on(dispatcherEvents.speaking, (speaking) => {
-        if (!speaking && !this.paused) {
-          this.songEntry++;
-          this.play();
-        }
-      });
+			this.dispatcher.on(dispatcherEvents.speaking, (speaking) => {
+				if (!speaking && !this.paused) {
+					this.songEntry++;
+					this.play();
+				}
+			});
 
-      this.dispatcher.on(dispatcherEvents.error, (error) => {
-        logger.error(error);
-        this.songEntry++;
-        this.play();
-      });
+			this.dispatcher.on(dispatcherEvents.error, (error) => {
+				logger.error(error);
+				this.songEntry++;
+				this.play();
+			});
 
-      if (process.argv[2] === '--debug') {
-        this.dispatcher.on(dispatcherEvents.debug, (info) => {
-          logger.debug(info);
-        });
-      }
-    } catch (error) {
-      logger.error(error);
-      this.songEntry++;
-      this.play();
-    }
-  }
+			if (process.argv[2] === '--debug') {
+				this.dispatcher.on(dispatcherEvents.debug, (info) => {
+					logger.debug(info);
+				});
+			}
+		} catch (error) {
+			logger.error(error);
+			this.songEntry++;
+			this.play();
+		}
+	}
 
-  async createStream() {
-    return this.createYoutubeStream();
-  }
+	async createStream() {
+		return this.createYoutubeStream();
+	}
 
-  createYoutubeStream() {
-    const stream = ytdl(process.env.MUSIC_URL, {
-      quality: 'highestaudio',
-      highWaterMark: 1 << 25
-    });
+	createYoutubeStream() {
+		const stream = ytdl(process.env.MUSIC_URL, {
+			quality: 'highestaudio',
+			highWaterMark: 1 << 25
+		});
 
-    stream.once(streamEvents.info, ({ title }) => {
-      this.song = title;
-      if (!this.updateDispatcherStatus()) {
-        this.updateSongPresence();
-      }
-    });
+		stream.once(streamEvents.info, ({ title }) => {
+			this.song = title;
+			if (!this.updateDispatcherStatus()) {
+				this.updateSongPresence();
+			}
+		});
 
-    return stream
-  }
+		return stream;
+	}
 
-  updateDispatcherStatus() {
-    if (!this.dispatcher) {
-      return null;
-    }
+	updateDispatcherStatus() {
+		if (!this.dispatcher) {
+			return null;
+		}
 
-    if (this.listeners > 0) {
-      return this.resumeDispatcher();
-    }
+		if (this.listeners > 0) {
+			return this.resumeDispatcher();
+		}
 
-    return this.pauseDispatcher();
-  }
+		return this.pauseDispatcher();
+	}
 
-  resumeDispatcher() {
-    if (this.paused === false) {
-      return false;
-    }
+	resumeDispatcher() {
+		if (this.paused === false) {
+			return false;
+		}
 
-    this.paused = false;
-    this.play();
-    this.updateSongPresence();
-    logger.info(`Music has been resumed. Playing ${this.song} for ${this.listeners} user(s) in ${this.channel.name}.`);
-    return true;
-  }
+		this.paused = false;
+		this.play();
+		this.updateSongPresence();
+		logger.info(
+			`Music has been resumed. Playing ${this.song} for ${this.listeners} user(s) in ${this.channel.name}.`
+		);
+		return true;
+	}
 
-  pauseDispatcher() {
-    if (this.paused === true) {
-      return false;
-    }
+	pauseDispatcher() {
+		if (this.paused === true) {
+			return false;
+		}
 
-    this.paused = true;
-    this.dispatcher.pause();
-    this.updateSongPresence();
-    logger.info('Music has been paused because nobody is in my channel.');
-    return true;
-  }
+		this.paused = true;
+		this.dispatcher.pause();
+		this.updateSongPresence();
+		logger.info('Music has been paused because nobody is in my channel.');
+		return true;
+	}
 
-  updateSongPresence() {
-    const icon = this.paused ? '❙ ❙' : '►';
-    this.updatePresence(`${icon} ${this.song}`);
-  }
+	updateSongPresence() {
+		const icon = this.paused ? '❙ ❙' : '►';
+		this.updatePresence(`${icon} ${this.song}`);
+	}
 }
 
 module.exports = Player;

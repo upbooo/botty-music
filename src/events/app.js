@@ -9,13 +9,13 @@ const voiceStateUpdate = 'voiceStateUpdate';
 const warn = 'warn';
 
 module.exports = {
-  debug,
-  error,
-  guildCreate,
-  guildDelete,
-  guildUnavailable,
-  invalidated,
-  ready,
-  voiceStateUpdate,
-  warn
+	debug,
+	error,
+	guildCreate,
+	guildDelete,
+	guildUnavailable,
+	invalidated,
+	ready,
+	voiceStateUpdate,
+	warn
 };

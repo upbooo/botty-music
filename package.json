@@ -24,7 +24,7 @@
   "dependencies": {
     "@discordjs/opus": "^0.3.3",
     "@greencoast/logger": "^1.0.1",
-    "discord.js": "^12.4.1",
+    "discord.js": "^13.3.0",
     "ytdl-core": "^4.8.0"
   },
   "devDependencies": {

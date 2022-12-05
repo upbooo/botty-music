@@ -28,7 +28,7 @@
     "ytdl-core": "^4.8.0"
   },
   "devDependencies": {
-    "eslint": "^7.26.0",
+    "eslint": "^8.29.0",
     "eslint-config-greencoast": "0.0.2"
   },
   "eslintConfig": {
